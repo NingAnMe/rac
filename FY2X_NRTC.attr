@@ -1,0 +1,684 @@
+[GLOBAL]        
+Conventions = CF-1.6 
+Metadata_Conventions = Unidata Dataset Discovery v1.0 
+standard_name_vocabulary = "CF Standard Name Table (Version 21, 22 March 2013)"
+project = "Global Space-based Inter-Calibration System <http://gsics.wmo.int>"
+title = DUMMY
+summary = "Coefficients of the GSICS Correction for the infrared channels of a GEOstationary imager using a LEO hyperspectral reference instrument"
+keywords = DUMMY
+references = "CMA GSICS Product documentation, "
+institution = "National Satellite meteorological Center(NSMC), CMA"
+license = "Information delivered as a GSICS product is generated in accordance with the GSICS principles and practices. GSICS products are public and may be used and redistributed freely. Any publication using GSICS products should acknowledge both GSICS and the relevant data creator organization. Neither the data creator, nor the data publisher, nor any of their employees or contractors, makes any warranty, express or implied, including warranties of merchantability and fitness for a particular purpose, or assumes any legal liability for the accuracy, completeness, or usefulness, of this information."
+naming_authority = cn.gov.cma.nsmc.gsics
+creator_name = "CMA/NSMC for Satellite Applications and Research GPRC"
+creator_email = xuna@cma.gov.cn
+creator_url = http://www.gsics.nsmc.cma.gov.cn 
+wmo_data_category = 30
+wmo_international_data_subcategory = 4 
+local_data_subcategory = 1 
+geospatial_lat_min = -30.0
+geospatial_lat_max = 30.0
+geospatial_lon_min = 75.0
+geospatial_lon_max = 160.0
+geospatial_lat_units = degrees_north 
+geospatial_lon_units = degrees_east 
+# 'demonstration', 'preoperational', 'operational'
+processing_level = demonstration/v1.0.0
+monitored_instrument = DUMMY
+reference_instrument = DUMMY
+date_created = DUMMY
+date_modified = DUMMY
+history = DUMMY
+id = DUMMY
+time_coverage_start = DUMMY
+time_coverage_end = DUMMY
+
+planck_function_constant_c1 = 1.19104E-5 
+planck_function_constant_c1_unit = mW(cm^-1)^-4 m^-2 sr^-1 
+planck_function_constant_c2 = 1.43877 
+planck_function_constant_c2_unit = K cm
+
+#Option 1
+radiance_to_brightness_conversion_formula = "tb = ((c2 * wnc) / LN(1. + (c1*wnc^3)/radiance) - beta) / alpha"
+brightness_to_radiance_conversion_formula = "radiance = (c1 * wnc^3) / (EXP(c2 * wnc / (alpha*tb+beta)) - 1)"
+
+[FY2C+SVISSR]
+_name = FY2D+SVISSR # zt modif: VISSR -> SVISSR
+_chan = 4           # band numbers
+_chan_strlen = 5    # band name length
+_lut_row = 1024     # lut 0 ~ 1023
+_ndays = 5          # n days before
+_change=,
+  [[wnc]]
+    wnc = 918.1308, 840.7400, 1431.7644, 2603.4799
+    _fmt = "f4"
+    _dims = chan,
+    units = "cm^-1"
+    long_name = "channel central frequency of channel as wavenumber"
+  [[channel_name]]
+    _fmt = "S1"
+    _dims = chan, chan_strlen
+    channel_name = IR108,IR120,IR067,IR038
+    long_name = "%(_name)s Channel Name"
+  [[central_wavelength]]
+    _fmt = "f4"
+    _dims = chan,
+    units = "m"
+    long_name = "%(_name)s Wavelength of Channel Centre"
+  [[date]]
+    _fmt = "f8"
+    _dims = date, validity
+    units = "seconds since 1970-01-01T00:00:00Z"
+    long_name = "date of evaluation"
+    calendar = "gregorian"
+    standard_name = "time"
+  [[validity_period]]
+    _fmt = "f8"
+    _dims = date,validity
+    units = "seconds since 1970-01-01T00:00:00Z"
+    long_name = "correction validity period"
+    calendar = "gregorian"
+    standard_name = "time"
+  [[slope]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = 1
+    long_name = "Regression Slope"
+    valid_min = -2.0
+    valid_max = 2.0
+  [[slope_se]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = 1
+    long_name = "Standard Error of Regression Slope"
+    valid_min = -2.0
+    valid_max = 2.0
+  [[offset]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "mW m-2 sr-1(cm-1)-1"   # zt modif: from 'K' 
+    long_name = "Regression Offset"
+    valid_min = -200.0
+    valid_max = 200.0 
+  [[offset_se]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "mW m-2 sr-1(cm-1)-1"
+    long_name = "Standard Error of Regression Offset"
+    valid_min = -200.0
+    valid_max = 200.0
+  [[covariance]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "mW m-2 sr-1(cm-1)-1"
+    long_name = "Regression Coefficients Covariance"
+    valid_min = -200.0
+    valid_max = 200.0
+  [[std_scene_tb]]
+    std_scene_tb = 286., 285., 247., 285.
+    _fmt = "f4"
+    _dims = chan,
+    units = "K"
+    long_name = "Brightness Temperature of Standard Scene"
+    valid_min = 230.0
+    valid_max = 290.0
+  [[std_scene_tb_bias]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "K"
+    long_name = "Brightness Temperature Bias for Standard Scene"
+    valid_min = -10.0
+    valid_max = 10.0
+  [[std_scene_tb_bias_se]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "K"
+    long_name = "Standard Error of Brightness Temperature Bias for Standard Scene"
+    valid_min = -10.0
+    valid_max = 10.0
+  [[number_of_collocations]]
+    _fmt = "i4"
+    _dims = date, chan
+    units = "1"
+    long_name = "Number of collocations used to calculate correction"
+    valid_min = 1
+    valid_max = 2147483647
+  [[beta]]
+    _fmt = "f4"
+    _dims = chan,
+    beta = 0.4112, 0.5428, 1.6438, 2.8161
+    units = "K"
+    long_name = "radiance to brightness temperature conversion coefficient beta"
+  [[alpha]]
+    _fmt = "f4"
+    _dims = chan,
+    alpha = 0.9978, 0.9971, 0.9863, 0.9824
+    units = "1"
+    long_name = "radiance to brightness temperature conversion coefficient alpha"
+  [[CAL_LUT]]
+    _fmt = "f4"
+    _dims = lut_row, chan
+    long_name = "CAL_LUT"
+  [[CAL_slope]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = 1
+    long_name = "CAL Regression Slope"
+  [[CAL_offset]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "K"
+    long_name = "CAL Regression Offset"
+    
+[FY2D+SVISSR]
+_name = FY2D+SVISSR # zt modif: VISSR -> SVISSR
+_chan = 4           # band numbers
+_chan_strlen = 5    # band name length
+_lut_row = 1024     # lut 0 ~ 1023
+_ndays = 5          # n days before
+_change='20110510','20110729','20120507','20120730'
+  [[wnc]]
+    wnc = 923.4366, 839.4041, 1429.0728, 2601.9680
+    _fmt = "f4"
+    _dims = chan,
+    units = "cm^-1"
+    long_name = "channel central frequency of channel as wavenumber"
+  [[channel_name]]
+    _fmt = "S1"
+    _dims = chan, chan_strlen
+    channel_name = IR108,IR120,IR067,IR038
+    long_name = "%(_name)s Channel Name"
+  [[central_wavelength]]
+    _fmt = "f4"
+    _dims = chan,
+    units = "m"
+    long_name = "%(_name)s Wavelength of Channel Centre"
+  [[date]]
+    _fmt = "f8"
+    _dims = date, validity
+    units = "seconds since 1970-01-01T00:00:00Z"
+    long_name = "date of evaluation"
+    calendar = "gregorian"
+    standard_name = "time"
+  [[validity_period]]
+    _fmt = "f8"
+    _dims = date,validity
+    units = "seconds since 1970-01-01T00:00:00Z"
+    long_name = "correction validity period"
+    calendar = "gregorian"
+    standard_name = "time"
+  [[slope]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = 1
+    long_name = "Regression Slope"
+    valid_min = -2.0
+    valid_max = 2.0
+  [[slope_se]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = 1
+    long_name = "Standard Error of Regression Slope"
+    valid_min = -2.0
+    valid_max = 2.0
+  [[offset]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "mW m-2 sr-1(cm-1)-1"   # zt modif: from 'K' 
+    long_name = "Regression Offset"
+    valid_min = -200.0
+    valid_max = 200.0 
+  [[offset_se]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "mW m-2 sr-1(cm-1)-1"
+    long_name = "Standard Error of Regression Offset"
+    valid_min = -200.0
+    valid_max = 200.0
+  [[covariance]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "mW m-2 sr-1(cm-1)-1"
+    long_name = "Regression Coefficients Covariance"
+    valid_min = -200.0
+    valid_max = 200.0
+  [[std_scene_tb]]
+    std_scene_tb = 286., 285., 247., 285.
+    _fmt = "f4"
+    _dims = chan,
+    units = "K"
+    long_name = "Brightness Temperature of Standard Scene"
+    valid_min = 230.0
+    valid_max = 290.0
+  [[std_scene_tb_bias]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "K"
+    long_name = "Brightness Temperature Bias for Standard Scene"
+    valid_min = -10.0
+    valid_max = 10.0
+  [[std_scene_tb_bias_se]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "K"
+    long_name = "Standard Error of Brightness Temperature Bias for Standard Scene"
+    valid_min = -10.0
+    valid_max = 10.0
+  [[number_of_collocations]]
+    _fmt = "i4"
+    _dims = date, chan
+    units = "1"
+    long_name = "Number of collocations used to calculate correction"
+    valid_min = 1
+    valid_max = 2147483647
+  [[beta]]
+    _fmt = "f4"
+    _dims = chan,
+    beta = 0.3865, 0.3710, 1.5094, 2.98396
+    units = "K"
+    long_name = "radiance to brightness temperature conversion coefficient beta"
+  [[alpha]]
+    _fmt = "f4"
+    _dims = chan,
+    alpha = 0.9979, 0.9980, 0.9874, 0.9814
+    units = "1"
+    long_name = "radiance to brightness temperature conversion coefficient alpha"
+  [[CAL_LUT]]
+    _fmt = "f4"
+    _dims = lut_row, chan
+    long_name = "CAL_LUT"
+  [[CAL_slope]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = 1
+    long_name = "CAL Regression Slope"
+  [[CAL_offset]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "K"
+    long_name = "CAL Regression Offset"
+    
+[FY2E+SVISSR]
+_name = FY2E+SVISSR  # zt modif: VISSR -> SVISSR
+_chan = 4            # band numbers
+_chan_strlen = 5     # band name length
+_lut_row = 1024      # lut 0 ~ 1023
+_ndays = 5           # n days
+_change=,
+  [[wnc]]
+    wnc = 923.0511, 820.0376, 1436.5964, 2568.2084
+    _fmt = "f4"
+    _dims = chan,
+    units = "cm^-1"
+    long_name = "channel central frequency of channel as wavenumber"
+  [[channel_name]]
+    _fmt = "S1"
+    _dims = chan, chan_strlen
+    channel_name = IR108,IR120,IR067,IR038
+    long_name = "%(_name)s Channel Name"
+  [[central_wavelength]]
+    _fmt = "f4"
+    _dims = chan,
+    units = "m"
+    long_name = "%(_name)s Wavelength of Channel Centre"
+  [[date]]
+    _fmt = "f8"
+    _dims = date, validity
+    units = "seconds since 1970-01-01T00:00:00Z"
+    long_name = "date of evaluation"
+    calendar = "gregorian"
+    standard_name = "time"
+  [[validity_period]]
+    _fmt = "f8"
+    _dims = date,validity
+    units = "seconds since 1970-01-01T00:00:00Z"
+    long_name = "correction validity period"
+    calendar = "gregorian"
+    standard_name = "time"
+  [[slope]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = 1
+    long_name = "Regression Slope"
+    valid_min = -2.0
+    valid_max = 2.0
+  [[slope_se]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = 1
+    long_name = "Standard Error of Regression Slope"
+    valid_min = -2.0
+    valid_max = 2.0
+  [[offset]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "mW m-2 sr-1(cm-1)-1"   # zt modif: from 'K' 
+    long_name = "Regression Offset"
+    valid_min = -200.0
+    valid_max = 200.0 
+  [[offset_se]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "mW m-2 sr-1(cm-1)-1"
+    long_name = "Standard Error of Regression Offset"
+    valid_min = -200.0
+    valid_max = 200.0
+  [[covariance]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "mW m-2 sr-1(cm-1)-1"
+    long_name = "Regression Coefficients Covariance"
+    valid_min = -200.0
+    valid_max = 200.0
+  [[std_scene_tb]]
+    std_scene_tb = 286., 285., 247., 285.
+    _fmt = "f4"
+    _dims = chan,
+    units = "K"
+    long_name = "Brightness Temperature of Standard Scene"
+    valid_min = 230.0
+    valid_max = 290.0
+  [[std_scene_tb_bias]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "K"
+    long_name = "Brightness Temperature Bias for Standard Scene"
+    valid_min = -10.0
+    valid_max = 10.0
+  [[std_scene_tb_bias_se]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "K"
+    long_name = "Standard Error of Brightness Temperature Bias for Standard Scene"
+    valid_min = -10.0
+    valid_max = 10.0
+  [[number_of_collocations]]
+    _fmt = "i4"
+    _dims = date, chan
+    units = "1"
+    long_name = "Number of collocations used to calculate correction"
+    valid_min = 1
+    valid_max = 2147483647
+  [[beta]]
+    _fmt = "f4"
+    _dims = chan,
+    beta = 0.3609, 0.2661, 1.3981, 2.9366
+    units = "K"
+    long_name = "radiance to brightness temperature conversion coefficient beta"
+  [[alpha]]
+    _fmt = "f4"
+    _dims = chan,
+    alpha = 0.9981, 0.9986, 0.9883, 0.9815
+    units = "1"
+    long_name = "radiance to brightness temperature conversion coefficient alpha"
+  [[CAL_LUT]]
+    _fmt = "f4"
+    _dims = lut_row, chan
+    long_name = "CAL_LUT"
+  [[CAL_slope]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = 1
+    long_name = "CAL Regression Slope"
+  [[CAL_offset]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "K"
+    long_name = "CAL Regression Offset" 
+            
+[FY2F+SVISSR]
+_name = FY2F+SVISSR  # zt modif: VISSR -> SVISSR
+_chan = 4         # band numbers
+_chan_strlen = 5  # band name length
+_lut_row = 1024       # lut 0 ~ 1023
+_ndays = 5        # n days
+_change=,
+  [[wnc]]
+    wnc = 925.0694, 833.3333, 1438.8489, 2659.5745
+    _fmt = "f4"
+    _dims = chan,
+    units = "cm^-1"
+    long_name = "channel central frequency of channel as wavenumber"
+  [[channel_name]]
+    _fmt = "S1"
+    _dims = chan, chan_strlen
+    channel_name = IR108,IR120,IR067,IR038
+    long_name = "%(_name)s Channel Name"
+  [[central_wavelength]]
+    _fmt = "f4"
+    _dims = chan,
+    units = "m"
+    long_name = "%(_name)s Wavelength of Channel Centre"
+  [[date]]
+    _fmt = "f8"
+    _dims = date, validity
+    units = "seconds since 1970-01-01T00:00:00Z"
+    long_name = "date of evaluation"
+    calendar = "gregorian"
+    standard_name = "time"
+  [[validity_period]]
+    _fmt = "f8"
+    _dims = date,validity
+    units = "seconds since 1970-01-01T00:00:00Z"
+    long_name = "correction validity period"
+    calendar = "gregorian"
+    standard_name = "time"
+  [[slope]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = 1
+    long_name = "Regression Slope"
+    valid_min = -2.0
+    valid_max = 2.0
+  [[slope_se]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = 1
+    long_name = "Standard Error of Regression Slope"
+    valid_min = -2.0
+    valid_max = 2.0
+  [[offset]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "mW m-2 sr-1(cm-1)-1"   # zt modif: from 'K' 
+    long_name = "Regression Offset"
+    valid_min = -200.0
+    valid_max = 200.0 
+  [[offset_se]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "mW m-2 sr-1(cm-1)-1"
+    long_name = "Standard Error of Regression Offset"
+    valid_min = -200.0
+    valid_max = 200.0
+  [[covariance]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "mW m-2 sr-1(cm-1)-1"
+    long_name = "Regression Coefficients Covariance"
+    valid_min = -200.0
+    valid_max = 200.0
+  [[std_scene_tb]]
+    std_scene_tb = 286., 285., 247., 285.
+    _fmt = "f4"
+    _dims = chan,
+    units = "K"
+    long_name = "Brightness Temperature of Standard Scene"
+    valid_min = 230.0
+    valid_max = 290.0
+  [[std_scene_tb_bias]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "K"
+    long_name = "Brightness Temperature Bias for Standard Scene"
+    valid_min = -10.0
+    valid_max = 10.0
+  [[std_scene_tb_bias_se]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "K"
+    long_name = "Standard Error of Brightness Temperature Bias for Standard Scene"
+    valid_min = -10.0
+    valid_max = 10.0
+  [[number_of_collocations]]
+    _fmt = "i4"
+    _dims = date, chan
+    units = "1"
+    long_name = "Number of collocations used to calculate correction"
+    valid_min = 1
+    valid_max = 2147483647
+  [[beta]]
+    _fmt = "f4"
+    _dims = chan,
+    beta = 0.01279, -0.14417, 1.84202, 2.51009
+    units = "K"
+    long_name = "radiance to brightness temperature conversion coefficient beta"
+  [[alpha]]
+    _fmt = "f4"
+    _dims = chan,
+    alpha = 0.99925, 0.99976, 0.99095, 0.99397
+    units = "1"
+    long_name = "radiance to brightness temperature conversion coefficient alpha"
+  [[CAL_LUT]]
+    _fmt = "f4"
+    _dims = lut_row, chan
+    long_name = "CAL_LUT"
+  [[CAL_slope]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = 1
+    long_name = "CAL Regression Slope"
+  [[CAL_offset]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "K"
+    long_name = "CAL Regression Offset" 
+            
+[FY2G+SVISSR]
+_name = FY2G+SVISSR  # zt modif: VISSR -> SVISSR
+_chan = 4         # band numbers
+_chan_strlen = 5  # band name length
+_lut_row = 1024       # lut 0 ~ 1023
+_ndays = 5        # n days
+_change=,
+  [[wnc]]
+    wnc = 925.0694, 833.3333, 1438.8489, 2659.5745
+    _fmt = "f4"
+    _dims = chan,
+    units = "cm^-1"
+    long_name = "channel central frequency of channel as wavenumber"
+  [[channel_name]]
+    _fmt = "S1"
+    _dims = chan, chan_strlen
+    channel_name = IR108,IR120,IR067,IR038
+    long_name = "%(_name)s Channel Name"
+  [[central_wavelength]]
+    _fmt = "f4"
+    _dims = chan,
+    units = "m"
+    long_name = "%(_name)s Wavelength of Channel Centre"
+  [[date]]
+    _fmt = "f8"
+    _dims = date, validity
+    units = "seconds since 1970-01-01T00:00:00Z"
+    long_name = "date of evaluation"
+    calendar = "gregorian"
+    standard_name = "time"
+  [[validity_period]]
+    _fmt = "f8"
+    _dims = date,validity
+    units = "seconds since 1970-01-01T00:00:00Z"
+    long_name = "correction validity period"
+    calendar = "gregorian"
+    standard_name = "time"
+  [[slope]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = 1
+    long_name = "Regression Slope"
+    valid_min = -2.0
+    valid_max = 2.0
+  [[slope_se]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = 1
+    long_name = "Standard Error of Regression Slope"
+    valid_min = -2.0
+    valid_max = 2.0
+  [[offset]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "mW m-2 sr-1(cm-1)-1"   # zt modif: from 'K' 
+    long_name = "Regression Offset"
+    valid_min = -200.0
+    valid_max = 200.0 
+  [[offset_se]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "mW m-2 sr-1(cm-1)-1"
+    long_name = "Standard Error of Regression Offset"
+    valid_min = -200.0
+    valid_max = 200.0
+  [[covariance]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "mW m-2 sr-1(cm-1)-1"
+    long_name = "Regression Coefficients Covariance"
+    valid_min = -200.0
+    valid_max = 200.0
+  [[std_scene_tb]]
+    std_scene_tb = 286., 285., 247., 285.
+    _fmt = "f4"
+    _dims = chan,
+    units = "K"
+    long_name = "Brightness Temperature of Standard Scene"
+    valid_min = 230.0
+    valid_max = 290.0
+  [[std_scene_tb_bias]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "K"
+    long_name = "Brightness Temperature Bias for Standard Scene"
+    valid_min = -10.0
+    valid_max = 10.0
+  [[std_scene_tb_bias_se]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "K"
+    long_name = "Standard Error of Brightness Temperature Bias for Standard Scene"
+    valid_min = -10.0
+    valid_max = 10.0
+  [[number_of_collocations]]
+    _fmt = "i4"
+    _dims = date, chan
+    units = "1"
+    long_name = "Number of collocations used to calculate correction"
+    valid_min = 1
+    valid_max = 2147483647
+  [[beta]]
+    _fmt = "f4"
+    _dims = chan,
+    beta = 0.01279, -0.14417, 1.84202, 2.51009
+    units = "K"
+    long_name = "radiance to brightness temperature conversion coefficient beta"
+  [[alpha]]
+    _fmt = "f4"
+    _dims = chan,
+    alpha = 0.99925, 0.99976, 0.99095, 0.99397
+    units = "1"
+    long_name = "radiance to brightness temperature conversion coefficient alpha"
+  [[CAL_LUT]]
+    _fmt = "f4"
+    _dims = lut_row, chan
+    long_name = "CAL_LUT"
+  [[CAL_slope]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = 1
+    long_name = "CAL Regression Slope"
+  [[CAL_offset]]
+    _fmt = "f4"
+    _dims = date, chan
+    units = "K"
+    long_name = "CAL Regression Offset" 
+            
