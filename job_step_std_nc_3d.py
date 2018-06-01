@@ -10,17 +10,13 @@ import os, sys, time
 from posixpath import join as urljoin
 
 from configobj import ConfigObj
-from dateutil.relativedelta import relativedelta
 from netCDF4 import Dataset, stringtoarr
 from numpy.lib.polynomial import polyfit
 from numpy.ma.core import std, mean
 from numpy.ma.extras import corrcoef
-# from scipy.interpolate.fitpack2 import UnivariateSpline
 import h5py
-from PB import pb_time
 from PB.CSC.pb_csc_console import LogServer
 import numpy as np
-from multiprocessing import Pool, Lock
 
 
 def run(matching, ymd, nc_type):
@@ -33,7 +29,7 @@ def run_FY3X_LEO(matching, ymd, nc_type):
     Log.info(u'[%s] [%s]' % (matching, ymd))
     # 解析配置文件
 
-    opath = GbalCfg['PATH']['OUT']['ISN']
+    opath = GLOBAL_CONFIG['PATH']['OUT']['ISN']
     nc = GSICS_STD_NC(ymd, matching, opath, nc_type)
     nc.loadMatchedPointHDF5()
     nc.calculate_LUT()
@@ -133,7 +129,7 @@ class GSICS_STD_NC(object):
         self.Tbb_Rad_LUT = np.loadtxt(Tbb2Rad_fp, ndmin=2)
 
         attr_fname = '%sX_%s.attr' % (self.sat1[:3], self.nc_type)
-        self.conf = ConfigObj(os.path.join(MainPath, attr_fname))
+        self.conf = ConfigObj(os.path.join(MAIN_PATH, attr_fname))
         self.chanlist = self.conf['%s+%s' % (self.sat1, self.sen1)]['_chanlist']
         self.chan = int(self.conf['%s+%s' % (self.sat1, self.sen1)]['_chan'])
         self.ndays = int(self.conf['%s+%s' % (self.sat1, self.sen1)]['_ndays'])
@@ -616,79 +612,46 @@ def Dust_Filter(x, y, a, b, mul=8):
     return idx
 
 
-# 获取程序参数接口
-args = sys.argv[1:]
-
-help_info = \
-    '''
-    国际标准NC日产品生成程序
-    [参数样例1]：SAT1+SENSOR1_SAT2+SENSOR2  YYYYMMDD-YYYYMMDD  nrtc(or rac)
-    [参数样例2]：跟1个参数(nrtc or rac)，自动处理所有pair
-    '''
-if '-h' in args:
-    print help_info
-    sys.exit(-1)
-
-# 获取程序所在位置，拼接配置文件
-MainPath, MainFile = os.path.split(os.path.realpath(__file__))
-ProjPath = os.path.dirname(MainPath)
-cfgFile = os.path.join(ProjPath, 'cfg', 'global.cfg')
-
-# 配置不存在预警
-if not os.path.isfile(cfgFile):
-    print u'配置文件不存在 %s' % cfgFile
-    sys.exit(-1)
-
-# 载入配置文件
-GbalCfg = ConfigObj(cfgFile)
-PARAM_DIR = GbalCfg['PATH']['PARAM']
-MATCH_DIR = GbalCfg['PATH']['MID']['MATCH_DATA']
-LogPath = GbalCfg['PATH']['OUT']['LOG']
-Log = LogServer(LogPath)  # 初始化日志
-
-# 开启进程池
-threadNum = int(GbalCfg['CROND']['threads'])
-pool = Pool(processes=threadNum)
-
-if len(args) == 3:
-    satPair = args[0]
-    str_time = args[1]
-    nc_type = args[2].upper()
-    if nc_type not in ["NRTC", "RAC"]:
-        print "arg 3 must be nrtc or rac !"
+######################### 程序全局入口 ##############################
+if __name__ == "__main__":
+    # 获取程序参数接口
+    ARGS = sys.argv[1:]
+    HELP_INFO = \
+        u"""
+        [参数1]：pair 卫星对
+        [参数2]：yyyymmdd 时间
+        [样例]: python app.py pair yyyymmdd
+        """
+    if "-h" in ARGS:
+        print HELP_INFO
         sys.exit(-1)
 
-    Log.info(u'手动%s产品生成程序开始运行-----------------------------' % nc_type)
+    # 获取程序所在位置，拼接配置文件
+    MAIN_PATH, MAIN_FILE = os.path.split(os.path.realpath(__file__))
+    PROJECT_PATH = os.path.dirname(MAIN_PATH)
+    OM_PATH = os.path.dirname(PROJECT_PATH)
+    DV_PATH = os.path.join(os.path.dirname(OM_PATH), "DV")
+    CONFIG_FILE = os.path.join(PROJECT_PATH, "cfg", "global.cfg")
 
-    date_s, date_e = pb_time.arg_str2date(str_time)
-
-    while date_s <= date_e:
-        ymd = date_s.strftime('%Y%m%d')
-        if threadNum == 1:
-            run(satPair, ymd, nc_type)
-        else:
-            pool.apply_async(run, (satPair, ymd, nc_type))
-        date_s = date_s + relativedelta(days=1)
-    pool.close()
-    pool.join()
-
-elif len(args) == 1:
-    nc_type = args[0].upper()
-    if nc_type not in ["NRTC", "RAC"]:
-        print "arg 1 must be nrtc or rac !"
+    # 配置不存在预警
+    if not os.path.isfile(CONFIG_FILE):
+        print (u"配置文件不存在 %s" % CONFIG_FILE)
         sys.exit(-1)
 
-    Log.info(u'自动%s产品生成程序开始运行 -----------------------------' % nc_type)
-    rolldays = GbalCfg['CROND']['rolldays']
-    pairLst = GbalCfg['PAIRS'].keys()
-    for satPair in pairLst:
-        for rdays in rolldays:
-            ymd = (datetime.datetime.utcnow() - relativedelta(
-                days=int(rdays))).strftime('%Y%m%d')
-            pool.apply_async(run, (satPair, ymd, nc_type))
-    pool.close()
-    pool.join()
-else:
-    print help_info
-    sys.exit(-1)
+    # 载入配置文件
+    GLOBAL_CONFIG = ConfigObj(CONFIG_FILE)
+    PARAM_DIR = GLOBAL_CONFIG['PATH']['PARAM']
+    MATCH_DIR = GLOBAL_CONFIG['PATH']['MID']['MATCH_DATA']
+    LogPath = GLOBAL_CONFIG['PATH']['OUT']['LOG']
+    Log = LogServer(LogPath)  # 初始化日志
 
+    if len(ARGS) == 2:
+        satPair = ARGS[0]
+        str_time = ARGS[1]
+
+        for NC_TYPE in ["NRTC", "RAC"]:
+            Log.info(u'开始运行国际标准%s的生成程序-----------------------------' % NC_TYPE)
+            run(satPair, str_time, NC_TYPE)
+    else:
+        print HELP_INFO
+        sys.exit(-1)

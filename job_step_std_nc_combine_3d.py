@@ -127,7 +127,7 @@ class GSICS_STD_NC(object):
         self.nc_path = os.path.join(self.nc_dir, self.nc_name)
 
         attr_fname = '%sX_%s.attr' % (self.sat1[:3], nc_type)
-        self.conf = ConfigObj(os.path.join(MainPath, attr_fname))
+        self.conf = ConfigObj(os.path.join(MAIN_PATH, attr_fname))
         self.chan = int(self.conf['%s+%s' % (self.sat1, self.sen1)]['_chan'])
         self.chanlist = self.conf['%s+%s' % (self.sat1, self.sen1)]['_chanlist']
         self.Custom_Global_Attrs = {}
@@ -323,64 +323,45 @@ class GSICS_STD_NC(object):
         self.rootgrp.close()
 
 
-# 获取程序参数接口
-args = sys.argv[1:]
-
-help_info = \
-    '''
-    国际标准NC合并产品的合成程序
-    [参数样例1]：SAT1+SENSOR1_SAT2+SENSOR2  nrtc(or rac)
-    [参数样例2]：跟1个参数(nrtc or rac)，自动处理所有pair
-    '''
-if '-h' in args:
-    print help_info
-    sys.exit(-1)
-
-# 获取程序所在位置，拼接配置文件
-MainPath, MainFile = os.path.split(os.path.realpath(__file__))
-ProjPath = os.path.dirname(MainPath)
-cfgFile = os.path.join(ProjPath, 'cfg', 'global.cfg')
-
-# 配置不存在预警
-if not os.path.isfile(cfgFile):
-    print (u'配置文件不存在 %s' % cfgFile)
-    sys.exit(-1)
-
-# 载入配置文件
-GbalCfg = ConfigObj(cfgFile)
-PARAM_DIR = GbalCfg['PATH']['PARAM']
-MATCH_DIR = GbalCfg['PATH']['MID']['MATCH_DATA']
-LogPath = GbalCfg['PATH']['OUT']['LOG']
-Log = LogServer(LogPath)  # 初始化日志
-
-if len(args) == 2:
-    # 获取命令行输入的参数 配置文件和开始结束时间  global.cfg
-    satPair = args[0]
-    nc_type = args[1].upper()
-    if nc_type not in ["NRTC", "RAC"]:
-        print "arg 2 must be nrtc or rac !"
+######################### 程序全局入口 ##############################
+if __name__ == "__main__":
+    # 获取程序参数接口
+    ARGS = sys.argv[1:]
+    HELP_INFO = \
+        u"""
+        [参数1]：pair 卫星对
+        [样例]: python app.py pair
+        """
+    if "-h" in ARGS:
+        print HELP_INFO
         sys.exit(-1)
 
-    Log.info(u'开始运行国际标准%s的合成程序-----------------------------' % nc_type)
+    # 获取程序所在位置，拼接配置文件
+    MAIN_PATH, MAIN_FILE = os.path.split(os.path.realpath(__file__))
+    PROJECT_PATH = os.path.dirname(MAIN_PATH)
+    OM_PATH = os.path.dirname(PROJECT_PATH)
+    DV_PATH = os.path.join(os.path.dirname(OM_PATH), "DV")
+    CONFIG_FILE = os.path.join(PROJECT_PATH, "cfg", "global.cfg")
 
-    ##################### 单线程运行 ########################
-    run(satPair, nc_type)
-
-elif len(args) == 1:
-    nc_type = args[0].upper()
-    if nc_type not in ["NRTC", "RAC"]:
-        print "arg 1 must be nrtc or rac !"
+    # 配置不存在预警
+    if not os.path.isfile(CONFIG_FILE):
+        print (u"配置文件不存在 %s" % CONFIG_FILE)
         sys.exit(-1)
 
-    Log.info(u'自动%s产品生成程序开始运行 -----------------------------' % nc_type)
-    threadNum = int(GbalCfg['CROND']['threads'])
-    pool = Pool(processes=threadNum)
-    pairLst = GbalCfg['PAIRS'].keys()
-    for satPair in pairLst:
-        pool.apply_async(run, (satPair, nc_type))
-    pool.close()
-    pool.join()
+    # 载入配置文件
+    GLOBAL_CONFIG = ConfigObj(CONFIG_FILE)
+    PARAM_DIR = GLOBAL_CONFIG['PATH']['PARAM']
+    MATCH_DIR = GLOBAL_CONFIG['PATH']['MID']['MATCH_DATA']
+    LogPath = GLOBAL_CONFIG['PATH']['OUT']['LOG']
+    Log = LogServer(LogPath)  # 初始化日志
 
-else:
-    print help_info
-    sys.exit(-1)
+    if len(ARGS) == 1:
+        # 获取命令行输入的参数 配置文件和开始结束时间  global.cfg
+        SAT_PAIR = ARGS[0]
+
+        for NC_TYPE in ["NRTC", "RAC"]:
+            Log.info(u'开始运行国际标准%s的合成程序-----------------------------' % NC_TYPE)
+            run(SAT_PAIR, NC_TYPE)
+    else:
+        print HELP_INFO
+        sys.exit(-1)
