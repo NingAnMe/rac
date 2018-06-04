@@ -629,9 +629,10 @@ if __name__ == "__main__":
     # 获取程序所在位置，拼接配置文件
     MAIN_PATH, MAIN_FILE = os.path.split(os.path.realpath(__file__))
     PROJECT_PATH = os.path.dirname(MAIN_PATH)
-    OM_PATH = os.path.dirname(PROJECT_PATH)
-    DV_PATH = os.path.join(os.path.dirname(OM_PATH), "DV")
     CONFIG_FILE = os.path.join(PROJECT_PATH, "cfg", "global.cfg")
+
+    PYTHON_PATH = os.environ.get("PYTHONPATH")
+    DV_PATH = os.path.join(PYTHON_PATH, "DV")
 
     # 配置不存在预警
     if not os.path.isfile(CONFIG_FILE):
