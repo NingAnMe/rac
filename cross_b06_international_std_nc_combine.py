@@ -21,7 +21,7 @@ def run(pair, nc_type):
 
 def run_FY3X_LEO(satPair, nc_type):
     # 解析配置文件
-    nc_root = GbalCfg['PATH']['OUT']['ISN']
+    nc_root = GLOBAL_CONFIG['PATH']['OUT']['ISN']
 
     ncPath = os.path.join(nc_root, satPair)
     ncList = [e for e in os.listdir(ncPath) if "SATCAL+%s+LEOLEOIR" % nc_type in e]
@@ -84,6 +84,8 @@ def run_FY3X_LEO(satPair, nc_type):
 #     dst_fp = os.path.join(dst_dir, nc.nc_name)
 #     pair_lst.append((nc.nc_path, dst_fp))
 
+    print "-" * 100
+    print nc.nc_path
     Log.info(u'Success')
 
 
@@ -127,7 +129,7 @@ class GSICS_STD_NC(object):
         self.nc_path = os.path.join(self.nc_dir, self.nc_name)
 
         attr_fname = '%sX_%s.attr' % (self.sat1[:3], nc_type)
-        self.conf = ConfigObj(os.path.join(MAIN_PATH, attr_fname))
+        self.conf = ConfigObj(os.path.join(MAIN_PATH, "cfg", attr_fname))
         self.chan = int(self.conf['%s+%s' % (self.sat1, self.sen1)]['_chan'])
         self.chanlist = self.conf['%s+%s' % (self.sat1, self.sen1)]['_chanlist']
         self.Custom_Global_Attrs = {}
@@ -338,8 +340,7 @@ if __name__ == "__main__":
 
     # 获取程序所在位置，拼接配置文件
     MAIN_PATH, MAIN_FILE = os.path.split(os.path.realpath(__file__))
-    PROJECT_PATH = os.path.dirname(MAIN_PATH)
-    CONFIG_FILE = os.path.join(PROJECT_PATH, "cfg", "global.cfg")
+    CONFIG_FILE = os.path.join(MAIN_PATH, "cfg", "global.cfg")
 
     PYTHON_PATH = os.environ.get("PYTHONPATH")
     DV_PATH = os.path.join(PYTHON_PATH, "DV")

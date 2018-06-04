@@ -30,6 +30,10 @@ def run_FY3X_LEO(matching, ymd, nc_type):
     # 解析配置文件
 
     opath = GLOBAL_CONFIG['PATH']['OUT']['ISN']
+    if len(ymd) != 8:
+        print "Args is error."
+        return
+
     nc = GSICS_STD_NC(ymd, matching, opath, nc_type)
     nc.loadMatchedPointHDF5()
     nc.calculate_LUT()
@@ -37,6 +41,8 @@ def run_FY3X_LEO(matching, ymd, nc_type):
         nc.create()
         nc.write()
         nc.close()
+        print "-" * 100
+        print nc.nc_path
         Log.info(u'Success')
 
 
@@ -125,11 +131,11 @@ class GSICS_STD_NC(object):
         self.nc_path = os.path.join(self.nc_dir, self.nc_name)
 
         Tbb2Rad_filename = '%s_LUT_TB_RB.TXT' % part1
-        Tbb2Rad_fp = os.path.join(PARAM_DIR, Tbb2Rad_filename)
+        Tbb2Rad_fp = os.path.join(MAIN_PATH, "cfg", Tbb2Rad_filename)
         self.Tbb_Rad_LUT = np.loadtxt(Tbb2Rad_fp, ndmin=2)
 
         attr_fname = '%sX_%s.attr' % (self.sat1[:3], self.nc_type)
-        self.conf = ConfigObj(os.path.join(MAIN_PATH, attr_fname))
+        self.conf = ConfigObj(os.path.join(MAIN_PATH, "cfg", attr_fname))
         self.chanlist = self.conf['%s+%s' % (self.sat1, self.sen1)]['_chanlist']
         self.chan = int(self.conf['%s+%s' % (self.sat1, self.sen1)]['_chan'])
         self.ndays = int(self.conf['%s+%s' % (self.sat1, self.sen1)]['_ndays'])
@@ -628,8 +634,7 @@ if __name__ == "__main__":
 
     # 获取程序所在位置，拼接配置文件
     MAIN_PATH, MAIN_FILE = os.path.split(os.path.realpath(__file__))
-    PROJECT_PATH = os.path.dirname(MAIN_PATH)
-    CONFIG_FILE = os.path.join(PROJECT_PATH, "cfg", "global.cfg")
+    CONFIG_FILE = os.path.join(MAIN_PATH, "cfg", "global.cfg")
 
     PYTHON_PATH = os.environ.get("PYTHONPATH")
     DV_PATH = os.path.join(PYTHON_PATH, "DV")
